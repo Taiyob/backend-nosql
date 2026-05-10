@@ -91,12 +91,17 @@ const changeStatus = async (id: string, payLoad: { status: string }) => {
 // };
 
 const getMe = async (userId: string, userRole: string) => {
-  let result = null;
+  let result: any = null;
 
   if (userRole === 'admin') {
-    result = await Admin.findOne({ id: userId }).populate('user');
+    result = await Admin.findOne({ id: userId }).populate('user').lean();
+    if (result && result.user) {
+      // Merge user role and status into the admin result for frontend compatibility
+      result.role = result.user.role;
+      result.status = result.user.status;
+    }
   } else {
-    result = await User.findOne({ id: userId });
+    result = await User.findOne({ id: userId }).lean();
   }
 
   return result;
@@ -128,6 +133,11 @@ const getGroupedInterests = async () => {
   return result;
 };
 
+const deleteUser = async (id: string) => {
+  const result = await User.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDb,
   createAdminIntoDb,
@@ -135,4 +145,5 @@ export const UserServices = {
   changeStatus,
   getAllUsersFromDb,
   getGroupedInterests,
+  deleteUser,
 };

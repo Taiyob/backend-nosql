@@ -89,6 +89,18 @@ const getGroupedInterests = catchAsync(async (req, res) => {
   });
 });
 
+const deleteUser = catchAsync(async (req, res) => {
+  const id = req.params.id;
+  const result = await UserServices.deleteUser(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User deleted successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   createAdmin,
@@ -96,4 +108,5 @@ export const UserController = {
   changeStatusFromDB,
   getAllUsers,
   getGroupedInterests,
+  deleteUser,
 };

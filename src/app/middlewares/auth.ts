@@ -39,11 +39,11 @@ const authMiddleware = (...requiredRoles: TUserRole[]) => {
         'This user is already deleted!!!',
       );
     }
-    const userStatus = user?.status;
-    if (userStatus === 'blocked') {
-      if (isDeleted) {
-        throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-      }
+    if (user?.status === 'blocked') {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        'Your account is blocked! Please contact the admin for assistance.',
+      );
     }
 
     if (

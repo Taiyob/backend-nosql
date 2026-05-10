@@ -46,4 +46,10 @@ router.get(
   UserController.getAllUsers,
 );
 
+router.delete(
+  '/:id',
+  authMiddleware(USER_ROLE.admin),
+  UserController.deleteUser,
+);
+
 export const UserRoutes = router;

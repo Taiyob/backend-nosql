@@ -77,7 +77,7 @@ const updateNote = catchAsync(async (req, res) => {
   }
 
   const user = await User.findOne({ id: userId });
-  if (userRole !== 'admin' && note.user._id.toString() !== user?._id.toString()) {
+  if (/* userRole !== 'admin' && */ note.user._id.toString() !== user?._id.toString()) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized to update this note');
   }
 
@@ -101,7 +101,7 @@ const deleteNote = catchAsync(async (req, res) => {
   }
 
   const user = await User.findOne({ id: userId });
-  if (userRole !== 'admin' && note.user._id.toString() !== user?._id.toString()) {
+  if (/* userRole !== 'admin' && */ note.user._id.toString() !== user?._id.toString()) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized to delete this note');
   }
 

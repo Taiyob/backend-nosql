@@ -15,7 +15,7 @@ router.post(
 
 router.post(
   '/change-password',
-  authMiddleware(USER_ROLE.student, USER_ROLE.faculty, USER_ROLE.admin),
+  authMiddleware(USER_ROLE.user, USER_ROLE.admin),
   validateRequestMiddleware(AuthValidation.changePasswordValidationAchema),
   AuthControllers.changePassword,
 );
