@@ -10,7 +10,7 @@ import jwt from 'jsonwebtoken';
 import { sendEmail } from '../../utils/sendEmail';
 
 const loginUserFromDB = async (payLoad: TLoginUser) => {
-  const user = await User.isUserExistByCustomId(payLoad?.id);
+  const user = await User.isUserExistByEmail(payLoad?.email);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found');

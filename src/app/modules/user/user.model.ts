@@ -10,7 +10,8 @@ const userSchema = new Schema<TUser, UserModel>(
     password: { type: String, required: true, select: 0 },
     needsPasswordChange: { type: Boolean, default: true },
     passwordChangedAt: { type: Date },
-    role: { type: String, enum: ['admin', 'student', 'faculty'] },
+    role: { type: String, enum: ['admin', 'user'] },
+    interests: { type: [String], default: [] },
     status: {
       type: String,
       enum: ['in-progress', 'blocked'],
@@ -20,6 +21,12 @@ const userSchema = new Schema<TUser, UserModel>(
   },
   { timestamps: true },
 );
+
+// Indexes
+userSchema.index({ email: 1 });
+userSchema.index({ id: 1 });
+userSchema.index({ role: 1 });
+userSchema.index({ interests: 1 });
 
 // pre save middleware/hook  :will work on create() and save() method
 userSchema.pre('save', async function (next) {
@@ -41,6 +48,10 @@ userSchema.post('save', function (doc, next) {
 
 userSchema.statics.isUserExistByCustomId = async function (id: string) {
   return await User.findOne({ id }).select('+password');
+};
+
+userSchema.statics.isUserExistByEmail = async function (email: string) {
+  return await User.findOne({ email }).select('+password');
 };
 
 userSchema.statics.isPasswordMatched = async function (

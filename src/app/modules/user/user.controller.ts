@@ -4,6 +4,18 @@ import sendResponse from '../../utils/sendResponse';
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 
+const createUser = catchAsync(async (req, res) => {
+  const { password, user: userData } = req.body;
+  const result = await UserServices.createUserIntoDb(password, userData);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User registered successfully',
+    data: result,
+  });
+});
+
 const createAdmin = catchAsync(async (req, res) => {
   const { password, admin } = req.body;
   const result = await UserServices.createAdminIntoDb(password, admin);
@@ -55,8 +67,33 @@ const getMeFromDB = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUsers = catchAsync(async (req, res) => {
+  const result = await UserServices.getAllUsersFromDb(req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users retrieved successfully',
+    data: result,
+  });
+});
+
+const getGroupedInterests = catchAsync(async (req, res) => {
+  const result = await UserServices.getGroupedInterests();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users grouped by interests retrieved successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
+  createUser,
   createAdmin,
   getMeFromDB,
   changeStatusFromDB,
+  getAllUsers,
+  getGroupedInterests,
 };

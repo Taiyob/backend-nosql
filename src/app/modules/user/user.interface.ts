@@ -8,13 +8,15 @@ export interface TUser {
   password: string;
   needsPasswordChange: boolean;
   passwordChangedAt?: Date;
-  role: 'admin' | 'student' | 'faculty';
+  role: 'admin' | 'user';
+  interests: string[];
   status: 'in-progress' | 'blocked';
   isDeleted: boolean;
 }
 
 export interface UserModel extends Model<TUser> {
   isUserExistByCustomId(id: string): Promise<TUser | null>;
+  isUserExistByEmail(email: string): Promise<TUser | null>;
   isPasswordMatched(
     plainPassword: string,
     hashedPassword: string,

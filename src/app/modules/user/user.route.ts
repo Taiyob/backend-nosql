@@ -9,6 +9,12 @@ import { UserValidation } from './user.validation';
 const router = express.Router();
 
 router.post(
+  '/register',
+  validateRequestMiddleware(UserValidation.userValidationSchema),
+  UserController.createUser,
+);
+
+router.post(
   '/create-admin',
   //authMiddleware(USER_ROLE.admin),
   validateRequestMiddleware(AdminValidation.createAdminValidationSchema),
@@ -24,8 +30,20 @@ router.post(
 
 router.get(
   '/me',
-  authMiddleware(USER_ROLE.student, USER_ROLE.faculty, USER_ROLE.student),
+  authMiddleware(USER_ROLE.admin, USER_ROLE.user),
   UserController.getMeFromDB,
+);
+
+router.get(
+  '/grouped-interests',
+  authMiddleware(USER_ROLE.admin),
+  UserController.getGroupedInterests,
+);
+
+router.get(
+  '/',
+  authMiddleware(USER_ROLE.admin),
+  UserController.getAllUsers,
 );
 
 export const UserRoutes = router;

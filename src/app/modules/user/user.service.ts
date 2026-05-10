@@ -3,11 +3,28 @@ import mongoose from 'mongoose';
 import config from '../../config';
 import { TUser } from './user.interface';
 import { User } from './user.model';
-import { generateAdminId } from './user.utils';
+import { generateAdminId, generateUserId } from './user.utils';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import QueryBuilder from '../../builder/QueryBuilder';
+
+const createUserIntoDb = async (password: string, payload: Partial<TUser>) => {
+  const userData: Partial<TUser> = { ...payload };
+
+  if (!password) {
+    userData.password = config.default_password as string;
+  } else {
+    userData.password = password;
+  }
+
+  userData.role = 'user';
+  userData.id = await generateUserId();
+
+  const result = await User.create(userData);
+  return result;
+};
 
 const createAdminIntoDb = async (password: string, payLoad: TAdmin) => {
   const userData: Partial<TUser> = {};
@@ -21,30 +38,30 @@ const createAdminIntoDb = async (password: string, payLoad: TAdmin) => {
   userData.role = 'admin';
   userData.email = payLoad.email;
 
-  const session = await mongoose.startSession();
+  // const session = await mongoose.startSession();
   try {
-    session.startTransaction();
+    // session.startTransaction();
 
     userData.id = await generateAdminId();
-    const newUser = await User.create([userData], { session });
-    if (!newUser.length) {
+    const newUser = await User.create(userData); // Changed from [userData] with session
+    if (!newUser) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create user');
     }
 
-    payLoad.id = newUser[0].id;
-    payLoad.user = newUser[0]._id;
-    const newAdmin = await Admin.create([payLoad], { session });
-    if (!newAdmin.length) {
+    payLoad.id = newUser.id;
+    payLoad.user = newUser._id;
+    const newAdmin = await Admin.create(payLoad); // Changed from [payLoad] with session
+    if (!newAdmin) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to create admin');
     }
 
-    await session.commitTransaction();
-    await session.endSession();
+    // await session.commitTransaction();
+    // await session.endSession();
 
     return newAdmin;
   } catch (error: any) {
-    await session.abortTransaction();
-    await session.endSession();
+    // await session.abortTransaction();
+    // await session.endSession();
 
     throw new Error(error);
   }
@@ -78,13 +95,44 @@ const getMe = async (userId: string, userRole: string) => {
 
   if (userRole === 'admin') {
     result = await Admin.findOne({ id: userId }).populate('user');
+  } else {
+    result = await User.findOne({ id: userId });
   }
 
   return result;
 };
 
+const getAllUsersFromDb = async (query: Record<string, unknown>) => {
+  const userQuery = new QueryBuilder(User.find(), query)
+    .search(['email', 'id'])
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await userQuery.modelQuery;
+  return result;
+};
+
+const getGroupedInterests = async () => {
+  const result = await User.aggregate([
+    { $unwind: '$interests' },
+    {
+      $group: {
+        _id: '$interests',
+        users: { $push: { id: '$id', email: '$email' } },
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+  return result;
+};
+
 export const UserServices = {
+  createUserIntoDb,
   createAdminIntoDb,
   getMe,
   changeStatus,
+  getAllUsersFromDb,
+  getGroupedInterests,
 };
