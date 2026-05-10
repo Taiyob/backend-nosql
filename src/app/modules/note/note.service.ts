@@ -14,7 +14,7 @@ const getAllNotesFromDb = async (query: Record<string, unknown>, userId?: string
     filter.user = userId;
   }
 
-  const noteQuery = new QueryBuilder(Note.find(filter), query)
+  const noteQuery = new QueryBuilder(Note.find(filter).populate('user'), query)
     .search(['title', 'content'])
     .filter()
     .sort()

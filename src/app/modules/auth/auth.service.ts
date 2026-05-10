@@ -19,11 +19,11 @@ const loginUserFromDB = async (payLoad: TLoginUser) => {
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!!!');
   }
-  const userStatus = user?.status;
-  if (userStatus === 'blocked') {
-    if (isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-    }
+  if (user?.status === 'blocked') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'This user is blocked! Please contact the admin for assistance.',
+    );
   }
   const isPasswordMatched = await User.isPasswordMatched(
     payLoad?.password,
@@ -69,11 +69,11 @@ const changePasswordFromDB = async (
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!!!');
   }
-  const userStatus = userInfo?.status;
-  if (userStatus === 'blocked') {
-    if (isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-    }
+  if (userInfo?.status === 'blocked') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'Your account is blocked! Please contact the admin.',
+    );
   }
   const isPasswordMatched = await User.isPasswordMatched(
     payLoad?.oldPassword,
@@ -117,11 +117,11 @@ const refreshToken = async (token: string) => {
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!!!');
   }
-  const userStatus = user?.status;
-  if (userStatus === 'blocked') {
-    if (isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-    }
+  if (user?.status === 'blocked') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'This user is blocked! Please contact the admin for assistance.',
+    );
   }
 
   if (
@@ -157,11 +157,11 @@ const forgetPassword = async (userId: string) => {
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!!!');
   }
-  const userStatus = user?.status;
-  if (userStatus === 'blocked') {
-    if (isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-    }
+  if (user?.status === 'blocked') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'This user is blocked! Please contact the admin for assistance.',
+    );
   }
 
   const jwtPayLoad = {
@@ -194,11 +194,11 @@ const resetPassword = async (
   if (isDeleted) {
     throw new AppError(httpStatus.FORBIDDEN, 'This user is already deleted!!!');
   }
-  const userStatus = user?.status;
-  if (userStatus === 'blocked') {
-    if (isDeleted) {
-      throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked!!!');
-    }
+  if (user?.status === 'blocked') {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      'This user is blocked! Please contact the admin for assistance.',
+    );
   }
 
   const decoded = jwt.verify(

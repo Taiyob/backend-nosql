@@ -35,3 +35,5 @@ process.on('uncaughtException', () => {
 
   process.exit(1);
 });
+
+export default app;
